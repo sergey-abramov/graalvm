@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Serverless Auth App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand { font-weight: bold; color: #007bff !important; }
+        .card { box-shadow: 0 0 15px rgba(0,0,0,0.1); border: none; }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+        .welcome-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt"></i> Serverless Auth
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i> 
+                        <span th:text="${user.firstName} + ' ' + ${user.lastName}">User Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                                <button type="submit" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <!-- Welcome Section -->
+        <div class="welcome-section p-4 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Welcome, <span th:text="${user.firstName}">User</span>!
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        You have successfully authenticated to your serverless application.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div th:if="${user.imageUrl}">
+                        <img th:src="${user.imageUrl}" alt="Profile" class="avatar border border-3 border-white">
+                    </div>
+                    <div th:unless="${user.imageUrl}">
+                        <div class="avatar bg-white text-primary d-inline-flex align-items-center justify-content-center">
+                            <i class="fas fa-user fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Info Cards -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-envelope fa-2x text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Email Address</h5>
+                                <p class="card-text text-muted" th:text="${user.email}">user@example.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-key fa-2x text-success"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Authentication Method</h5>
+                                <p class="card-text text-muted">
+                                    <span th:if="${user.provider.name() == 'LOCAL'}">
+                                        <i class="fas fa-lock me-1"></i>Email & Password
+                                    </span>
+                                    <span th:if="${user.provider.name() == 'GOOGLE'}">
+                                        <i class="fab fa-google me-1"></i>Google OAuth2
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-cloud fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Serverless</h5>
+                        <p class="card-text text-muted">Running on AWS Lambda</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-rocket fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">GraalVM Native</h5>
+                        <p class="card-text text-muted">Fast cold starts</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shield-alt fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Secure</h5>
+                        <p class="card-text text-muted">OAuth2 + JWT</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <a href="/profile" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-user me-2"></i>Edit Profile
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-outline-info w-100" onclick="fetchUserInfo()">
+                                    <i class="fas fa-info-circle me-2"></i>API Test
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Response -->
+        <div id="apiResponse" class="mt-3" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">API Response</h6>
+                </div>
+                <div class="card-body">
+                    <pre id="apiData" class="mb-0"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function fetchUserInfo() {
+            try {
+                const response = await fetch('/api/user/info');
+                const data = await response.json();
+                
+                document.getElementById('apiData').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('apiResponse').style.display = 'block';
+            } catch (error) {
+                document.getElementById('apiData').textContent = 'Error: ' + error.message;
+                document.getElementById('apiResponse').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
