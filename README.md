@@ -73,6 +73,24 @@ spring.security.oauth2.client.registration.google.redirect-uri=https://your-api-
 
 ### 5. Тестирование
 
+Step 1 - Build the native image
+
+Change into the project directory
+Run the following to build a Docker container image which will include all the necessary dependencies to build the application
+```bash
+docker build . -t sam/custom-graal-image
+```
+
+Build the application within the previously created build image
+```bash
+sam build --use-container --build-image sam/custom-graal-image
+```
+After the build finishes, you need to deploy the function:
+```bash
+sam deploy --guided
+```
+
+
 #### Сборка и создание native image через Docker
 ```bash
 sam build --use-container
